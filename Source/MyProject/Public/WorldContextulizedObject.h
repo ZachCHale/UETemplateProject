@@ -13,6 +13,13 @@
 UCLASS(BlueprintType, Blueprintable)
 class MYPROJECT_API UWorldContextulizedObject : public UObject {
 	GENERATED_BODY()
+protected:
+	/** Event when instance is created from class. */
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Initialization"))
+	void OnInit();
 public:
+	UWorldContextulizedObject() {
+		OnInit();
+	}
 	UWorld* GetWorld() const;
 };
