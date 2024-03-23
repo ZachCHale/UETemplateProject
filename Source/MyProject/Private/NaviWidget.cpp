@@ -48,20 +48,13 @@ TArray<UNaviWidget*> UNaviWidget::GetNaviWidgetsFromRootToThis()
 {
 	TArray<UNaviWidget*> naviWidgets;
 	UNaviWidget* current = this;
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT("%s"), *this->GetName()));
 
 	naviWidgets.Insert(current, 0);
-	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Added %s"), *current->GetName()));
 	while (current->HasParentNaviWidget()) {
 		current = current->GetParentNaviWidget();
 		naviWidgets.Insert(current, 0);
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, FString::Printf(TEXT("Added %s"), *current->GetName()));
 	}
 
-	for (auto NaviWidget : naviWidgets)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, FString::Printf(TEXT("Added %s"), *NaviWidget->GetName()));
-	}
 
 
 	return naviWidgets;
@@ -74,7 +67,7 @@ void UNaviWidget::SetParentNaviWidgetExplicit(UNaviWidget* NewParent)
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("SetParentNaviWidgetExplicit is called multiple times on %s. This is not recommended, input will only bubble up the last set parent."), *this->GetName()));
 	}
 	bIsParentSetExplicitly = true;
-	ParentNaviWidget = NewParent;
+	SetParent(NewParent);
 }
 
 void UNaviWidget::NavigateTo()
@@ -87,15 +80,98 @@ void UNaviWidget::NativeConstruct()
 	Super::NativeConstruct();
 	if(bIsParentSetExplicitly)
 		return;
-	UObject* ParentObject = GetOuter();
-	while (IsValid(ParentObject))
+	
+	UObject* Parent = GetParent();
+	UObject* Outer = GetOuter();
+	if(IsValid(Parent))
 	{
-		if(ParentObject->IsA(UNaviWidget::StaticClass()))
-		{
-			ParentNaviWidget = Cast<UNaviWidget>(ParentObject);
-			break;
-		}
-		ParentObject = ParentObject->GetOuter();
+		TryParentingTo(Parent);
+	}else if(IsValid(Parent))
+	{
+		TryParentingTo(Outer);
 	}
 }
+
+void UNaviWidget::DisplayNaviPath()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("|Display NaviPath|"));
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT(" ^ %s"), *this->GetName()));
+	UNaviWidget* CurrentParent = GetParentNaviWidget();
+	while (IsValid(CurrentParent))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT(" ^ %s"), *CurrentParent->GetName()));
+		CurrentParent = CurrentParent->GetParentNaviWidget();
+	}
+
+}
+
+void UNaviWidget::DisplayAutomatedNaviPath()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("|Display AutomatedNaviPath|"));
+	DisplayFullPath(this);
+
+}
+
+void UNaviWidget::DisplayFullPath(UObject* Object)
+{
+	UWidget* AsWidget = Cast<UWidget>(Object);
+	UObject* nextParent = nullptr;
+	UObject* nextOuter = Object->GetOuter();
+	if(IsValid(AsWidget))
+	{
+		UNaviWidget* AsNaviWidget = Cast<UNaviWidget>(Object);
+		if(IsValid(AsNaviWidget))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, FString::Printf(TEXT(" !^! NW:  %s"), *Object->GetName()));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan, FString::Printf(TEXT("  ^  UW:  %s"), *Object->GetName()));
+		}
+		nextParent = AsWidget->GetParent();
+	}else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, FString::Printf(TEXT("^ UO: %s"), *Object->GetName()));
+	}
+	if(IsValid(nextParent))
+	{
+		DisplayFullPath(nextParent);
+	}else if(IsValid(nextOuter))
+	{
+		DisplayFullPath(nextOuter);
+	}
+}
+
+void UNaviWidget::TryParentingTo(UObject* Object)
+{
+	UWidget* AsWidget = Cast<UWidget>(Object);
+	UObject* nextParent = nullptr;
+	UObject* nextOuter = Object->GetOuter();
+	if(IsValid(AsWidget))
+	{
+		UNaviWidget* AsNaviWidget = Cast<UNaviWidget>(Object);
+		if(IsValid(AsNaviWidget))
+		{
+			SetParent(AsNaviWidget);
+			return;
+		}
+		nextParent = AsWidget->GetParent();
+	}
+	if(IsValid(nextParent))
+	{
+		TryParentingTo(nextParent);
+	}else if(IsValid(nextOuter))
+	{
+		TryParentingTo(nextOuter);
+	}
+}
+
+void UNaviWidget::SetParent(UNaviWidget* Parent)
+{
+	//TODO: Add check to make sure there are no NaviWidget Loops then display error.
+	
+	ParentNaviWidget = Parent;
+}
+
+
 

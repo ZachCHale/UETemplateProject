@@ -45,10 +45,6 @@ public:
 	void OnInputSubmit();
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnInputCancel();
-	//UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	//void OnEnterNavigation();
-	//UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	//void OnExitNavigation();
 	/**
 	* Triggers whenever the widget is directly Navigated to, regardless of coming from a descendant or some other NaviWidget
 	*/
@@ -96,10 +92,17 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FNavigatedOutDelegate OnNavigatedOutFinished;
 
-	
+	UFUNCTION(BlueprintCallable)
+	void DisplayNaviPath();
+	UFUNCTION(BlueprintCallable)
+	void DisplayAutomatedNaviPath();
+	void DisplayFullPath(UObject* Object);
 
 private:
 	UPROPERTY()
 	UNaviWidget* ParentNaviWidget;
 	bool bIsParentSetExplicitly;
+	void TryParentingTo(UObject* Object);
+	void SetParent(UNaviWidget* Parent);
+
 };

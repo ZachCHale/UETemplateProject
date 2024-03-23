@@ -21,7 +21,7 @@ void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 	NavigationQueue.Add(NewTargetNaviWidget);
 	if(bNavigationInProgress)
 		return;
-
+	bNavigationInProgress = true;
 
 	while(NavigationQueue.Num() > 0)
 	{
