@@ -44,4 +44,7 @@ private:
 	UPROPERTY()
 	UNaviWidget* CurrentNaviWidget;
 	void ShowMessageInvalidCurrentNaviWidget();
+	TArray<UNaviWidget*> NavigationQueue;
+
+	bool bNavigationInProgress;
 };

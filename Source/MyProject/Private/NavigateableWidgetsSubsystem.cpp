@@ -16,83 +16,67 @@ void UNavigateableWidgetsSubsystem::Deinitialize()
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("NavigateableWidgetSubsystem: Deinitialized"));
 }
 
-void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* TargetNaviWidget)
+void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("Navigate to %s"), *TargetNaviWidget->GetName()));
+	NavigationQueue.Add(NewTargetNaviWidget);
+	if(bNavigationInProgress)
+		return;
 
 
-	if (!IsValid(CurrentNaviWidget))
+	while(NavigationQueue.Num() > 0)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("FIRST NAV"));
-
-		CurrentNaviWidget = TargetNaviWidget;
-		TArray<UNaviWidget*> NewNaviWidgetPath = TargetNaviWidget->GetNaviWidgetsFromRootToThis();
-
-		for (auto NaviWidget : NewNaviWidgetPath)
+		UNaviWidget* TargetNaviWidget = NavigationQueue[0];
+		NavigationQueue.RemoveAt(0);
+		if (!IsValid(CurrentNaviWidget))
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("a"));
+			CurrentNaviWidget = TargetNaviWidget;
+			TArray<UNaviWidget*> NewNaviWidgetPath = TargetNaviWidget->GetNaviWidgetsFromRootToThis();
 
-			if(NaviWidget == TargetNaviWidget)
-				NaviWidget->OnNavigatedTo();
-			else
-				NaviWidget->OnNavigatedIn();
-		}
-	}
-	else
-	{
-		TArray<UNaviWidget*> PrevNaviWidgetPath = CurrentNaviWidget->GetNaviWidgetsFromRootToThis();
-		TArray<UNaviWidget*> NewNaviWidgetPath = TargetNaviWidget->GetNaviWidgetsFromRootToThis();
-		CurrentNaviWidget = TargetNaviWidget;
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("Previous"));
-
-		for (auto NaviWidgetPath : PrevNaviWidgetPath)
-		{
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *NaviWidgetPath->GetName()));
-		}
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("New"));
-
-		for (auto NaviWidgetPath : NewNaviWidgetPath)
-		{
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *NaviWidgetPath->GetName()));
-
-		}
-
-		
-		for(int i = PrevNaviWidgetPath.Num()-1; i>=0; i--)
-		{
-			if(NewNaviWidgetPath.Num()>i)
+			for (auto NaviWidget : NewNaviWidgetPath)
 			{
-				if(PrevNaviWidgetPath[i] != NewNaviWidgetPath[i])
-				{
-					PrevNaviWidgetPath[i]->OnNavigatedOut();
-					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *PrevNaviWidgetPath[i]->GetName()));
-					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *NewNaviWidgetPath[i]->GetName()));
-
-
-				}
-			}else
-			{
-				PrevNaviWidgetPath[i]->OnNavigatedOut();
-			//	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("2"));
-
+				if(NaviWidget == TargetNaviWidget)
+					NaviWidget->OnNavigatedTo();
+				else
+					NaviWidget->OnNavigatedIn();
 			}
 		}
-
-		for(int i = 0; i < NewNaviWidgetPath.Num()-1; i++)
+		else
 		{
-			if(PrevNaviWidgetPath.Num()>i)
+			TArray<UNaviWidget*> PrevNaviWidgetPath = CurrentNaviWidget->GetNaviWidgetsFromRootToThis();
+			TArray<UNaviWidget*> NewNaviWidgetPath = TargetNaviWidget->GetNaviWidgetsFromRootToThis();
+			CurrentNaviWidget = TargetNaviWidget;
+		
+			for(int i = PrevNaviWidgetPath.Num()-1; i>=0; i--)
 			{
-				if(PrevNaviWidgetPath[i] != NewNaviWidgetPath[i])
+				if(NewNaviWidgetPath.Num()>i)
+				{
+					if(PrevNaviWidgetPath[i] != NewNaviWidgetPath[i])
+					{
+						PrevNaviWidgetPath[i]->OnNavigatedOut();
+					}
+				}else
+				{
+					PrevNaviWidgetPath[i]->OnNavigatedOut();
+				}
+			}
+
+			for(int i = 0; i < NewNaviWidgetPath.Num()-1; i++)
+			{
+				if(PrevNaviWidgetPath.Num()>i)
+				{
+					if(PrevNaviWidgetPath[i] != NewNaviWidgetPath[i])
+					{
+						NewNaviWidgetPath[i]->OnNavigatedIn();
+					}
+				}else
 				{
 					NewNaviWidgetPath[i]->OnNavigatedIn();
 				}
-			}else
-			{
-				NewNaviWidgetPath[i]->OnNavigatedIn();
 			}
+			TargetNaviWidget->OnNavigatedTo();
 		}
-		TargetNaviWidget->OnNavigatedTo();
 	}
+	bNavigationInProgress = false;
 }
 
 void UNavigateableWidgetsSubsystem::InputSubmit()
