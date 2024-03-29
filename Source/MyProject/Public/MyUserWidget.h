@@ -15,6 +15,6 @@ class MYPROJECT_API UMyUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(Instanced, BlueprintReadWrite, EditAnywhere)
-	TArray<TObjectPtr<UTestInstObject>> testArray;
+	//UPROPERTY(Instanced, BlueprintReadWrite, EditAnywhere)
+	//TArray<TObjectPtr<UTestInstObject>> testArray;
 };

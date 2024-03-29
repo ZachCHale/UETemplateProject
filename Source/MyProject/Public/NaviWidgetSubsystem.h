@@ -7,14 +7,15 @@
 #include "NaviWidget.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
-#include "NavigateableWidgetsSubsystem.generated.h"
+#include "NaviWidgetSubsystem.generated.h"
 
 
+DECLARE_LOG_CATEGORY_EXTERN(NaviWidgetLog, Log, All);
 /**
  * 
  */
 UCLASS()
-class MYPROJECT_API UNavigateableWidgetsSubsystem : public UWorldSubsystem
+class MYPROJECT_API UNaviWidgetSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 
@@ -38,12 +39,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void InputRight();
 
-	void Construct();
+	UFUNCTION(BlueprintCallable)
+	void DisplayCurrentNaviWidgetName();
+
+	UFUNCTION(BlueprintCallable)
+	void DisplayCurrentNaviWidgetPath();
 
 private:
 	UPROPERTY()
 	UNaviWidget* CurrentNaviWidget;
 	void ShowMessageInvalidCurrentNaviWidget();
+	UPROPERTY()
 	TArray<UNaviWidget*> NavigationQueue;
 
 	bool bNavigationInProgress;

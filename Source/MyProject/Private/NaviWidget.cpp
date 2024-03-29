@@ -3,7 +3,7 @@
 
 #include "NaviWidget.h"
 
-#include "NavigateableWidgetsSubsystem.h"
+#include "NaviWidgetSubsystem.h"
 #include "Components/PanelWidget.h"
 
 void UNaviWidget::DoesActionBubbleUp_Implementation(ENaviWidgetActionType ActionType, bool& bDoesBubbleUp)
@@ -72,7 +72,7 @@ void UNaviWidget::SetParentNaviWidgetExplicit(UNaviWidget* NewParent)
 
 void UNaviWidget::NavigateTo()
 {
-	GetWorld()->GetSubsystem<UNavigateableWidgetsSubsystem>()->NavigateTo(this);
+	GetWorld()->GetSubsystem<UNaviWidgetSubsystem>()->NavigateTo(this);
 }
 
 void UNaviWidget::NativeConstruct()

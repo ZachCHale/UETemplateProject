@@ -1,22 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "NaviWidgetSubsystem.h"
 
-#include "NavigateableWidgetsSubsystem.h"
+DEFINE_LOG_CATEGORY(NaviWidgetLog);
 
-void UNavigateableWidgetsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+void UNaviWidgetSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("NavigateableWidgetSubsystem: Initialized"));
 
 }
 
-void UNavigateableWidgetsSubsystem::Deinitialize()
+void UNaviWidgetSubsystem::Deinitialize()
 {
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("NavigateableWidgetSubsystem: Deinitialized"));
 }
 
-void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
+void UNaviWidgetSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 {
 	NavigationQueue.Add(NewTargetNaviWidget);
 	if(bNavigationInProgress)
@@ -27,6 +28,8 @@ void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 	{
 		UNaviWidget* TargetNaviWidget = NavigationQueue[0];
 		NavigationQueue.RemoveAt(0);
+		if(!IsValid(TargetNaviWidget))
+			continue;
 		if (!IsValid(CurrentNaviWidget))
 		{
 			CurrentNaviWidget = TargetNaviWidget;
@@ -79,7 +82,7 @@ void UNavigateableWidgetsSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 	bNavigationInProgress = false;
 }
 
-void UNavigateableWidgetsSubsystem::InputSubmit()
+void UNaviWidgetSubsystem::InputSubmit()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -88,18 +91,18 @@ void UNavigateableWidgetsSubsystem::InputSubmit()
 	}
 	
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputSubmit();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Submit, bBubbleUpAction);
+	NaviWidgetI->OnInputSubmit();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputSubmit();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Submit, bBubbleUpAction);
+		NaviWidgetI->OnInputSubmit();
 	}
 }
 
-void UNavigateableWidgetsSubsystem::InputCancel()
+void UNaviWidgetSubsystem::InputCancel()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -108,18 +111,18 @@ void UNavigateableWidgetsSubsystem::InputCancel()
 	}
 	
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputCancel();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Cancel, bBubbleUpAction);
+	NaviWidgetI->OnInputCancel();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputCancel();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Cancel, bBubbleUpAction);
+		NaviWidgetI->OnInputCancel();
 	}
 }
 
-void UNavigateableWidgetsSubsystem::InputUp()
+void UNaviWidgetSubsystem::InputUp()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -128,18 +131,18 @@ void UNavigateableWidgetsSubsystem::InputUp()
 	}
 
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputUp();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Up, bBubbleUpAction);
+	NaviWidgetI->OnInputUp();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputUp();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Up, bBubbleUpAction);
+		NaviWidgetI->OnInputUp();
 	}
 }
 
-void UNavigateableWidgetsSubsystem::InputDown()
+void UNaviWidgetSubsystem::InputDown()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -148,18 +151,18 @@ void UNavigateableWidgetsSubsystem::InputDown()
 	}
 	
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputDown();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Down, bBubbleUpAction);
+	NaviWidgetI->OnInputDown();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputDown();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Down, bBubbleUpAction);
+		NaviWidgetI->OnInputDown();
 	}
 }
 
-void UNavigateableWidgetsSubsystem::InputLeft()
+void UNaviWidgetSubsystem::InputLeft()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -168,18 +171,18 @@ void UNavigateableWidgetsSubsystem::InputLeft()
 	}
 	
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputLeft();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Left, bBubbleUpAction);
+	NaviWidgetI->OnInputLeft();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputLeft();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Left, bBubbleUpAction);
+		NaviWidgetI->OnInputLeft();
 	}
 }
 
-void UNavigateableWidgetsSubsystem::InputRight()
+void UNaviWidgetSubsystem::InputRight()
 {
 	if(!IsValid(CurrentNaviWidget))
 	{
@@ -188,19 +191,35 @@ void UNavigateableWidgetsSubsystem::InputRight()
 	}
 	
 	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
-	NaviWidgetI->OnInputRight();
 	bool bBubbleUpAction;
 	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Right, bBubbleUpAction);
+	NaviWidgetI->OnInputRight();
 	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
 	{
 		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
-		NaviWidgetI->OnInputRight();
 		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_Right, bBubbleUpAction);
+		NaviWidgetI->OnInputRight();
+	}
+}
+
+void UNaviWidgetSubsystem::DisplayCurrentNaviWidgetName()
+{
+	UE_LOG(NaviWidgetLog, Display, TEXT("Current Navi Widget: %s"), *CurrentNaviWidget->GetName());
+}
+
+void UNaviWidgetSubsystem::DisplayCurrentNaviWidgetPath()
+{
+	UE_LOG(NaviWidgetLog, Display, TEXT("%s"), *CurrentNaviWidget->GetName());
+	UNaviWidget* Current = CurrentNaviWidget;
+	while (Current->HasParentNaviWidget())
+	{
+		Current = Current->GetParentNaviWidget();
+		UE_LOG(NaviWidgetLog, Display, TEXT("%s"), *Current->GetName());
 	}
 }
 
 
-void UNavigateableWidgetsSubsystem::ShowMessageInvalidCurrentNaviWidget()
+void UNaviWidgetSubsystem::ShowMessageInvalidCurrentNaviWidget()
 {
 	if (!IsValid(CurrentNaviWidget))
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Yellow, TEXT("NavigateableWidgetSubsystem: No Current Widget Set. Call NavigateTo() to set the initial widget in focus."));

@@ -9,8 +9,8 @@
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType,DefaultToInstanced, EditInlineNew)
-class MYPROJECT_API UTestInstObject : public UObject
+USTRUCT(BlueprintType)
+struct MYPROJECT_API FTestInstObject
 {
 	GENERATED_BODY()
 
