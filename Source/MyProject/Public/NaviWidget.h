@@ -15,8 +15,8 @@ enum class ENaviWidgetActionType : uint8
 	ENWAT_Down,
 	ENWAT_Left,
 	ENWAT_Right,
-	//ENWAT_PageLeft, //BumperButtons
-	//ENWAT_PageRight,
+	ENWAT_PageLeft, 
+	ENWAT_PageRight,
 	//ENWAT_MiscAction1, //Other face buttons
 	//ENWAT_MiscAction2,
 	//ENWAT_SpecialLeft,	//Start And Select. Should name these after actions and not the button. (ex: Home - Info - Details)
@@ -45,6 +45,10 @@ public:
 	void OnInputSubmit();
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void OnInputCancel();
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnInputPageLeft();
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void OnInputPageRight();
 	/**
 	* Triggers whenever the widget is directly Navigated to, regardless of coming from a descendant or some other NaviWidget
 	*/

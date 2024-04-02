@@ -38,6 +38,10 @@ public:
 	void InputLeft();
 	UFUNCTION(BlueprintCallable)
 	void InputRight();
+	UFUNCTION(BlueprintCallable)
+	void InputPageLeft();
+	UFUNCTION(BlueprintCallable)
+	void InputPageRight();
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayCurrentNaviWidgetName();

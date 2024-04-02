@@ -202,6 +202,46 @@ void UNaviWidgetSubsystem::InputRight()
 	}
 }
 
+void UNaviWidgetSubsystem::InputPageLeft()
+{
+	if(!IsValid(CurrentNaviWidget))
+	{
+		ShowMessageInvalidCurrentNaviWidget();
+		return;
+	}
+	
+	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
+	bool bBubbleUpAction;
+	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_PageLeft, bBubbleUpAction);
+	NaviWidgetI->OnInputPageLeft();
+	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
+	{
+		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
+		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_PageLeft, bBubbleUpAction);
+		NaviWidgetI->OnInputPageLeft();
+	}
+}
+
+void UNaviWidgetSubsystem::InputPageRight()
+{
+	if(!IsValid(CurrentNaviWidget))
+	{
+		ShowMessageInvalidCurrentNaviWidget();
+		return;
+	}
+	
+	UNaviWidget* NaviWidgetI = CurrentNaviWidget;
+	bool bBubbleUpAction;
+	NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_PageRight, bBubbleUpAction);
+	NaviWidgetI->OnInputPageRight();
+	while(bBubbleUpAction && NaviWidgetI->HasParentNaviWidget())
+	{
+		NaviWidgetI = NaviWidgetI->GetParentNaviWidget();
+		NaviWidgetI->DoesActionBubbleUp(ENaviWidgetActionType::ENWAT_PageRight, bBubbleUpAction);
+		NaviWidgetI->OnInputPageRight();
+	}
+}
+
 void UNaviWidgetSubsystem::DisplayCurrentNaviWidgetName()
 {
 	UE_LOG(NaviWidgetLog, Display, TEXT("Current Navi Widget: %s"), *CurrentNaviWidget->GetName());
