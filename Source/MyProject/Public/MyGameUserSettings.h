@@ -6,6 +6,8 @@
 #include "GameFramework/GameUserSettings.h"
 #include "MyGameUserSettings.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAudioUINeedsRedrawDelegate);
+
 /**
  * 
  */
@@ -29,6 +31,11 @@ public:
 	void SetAudioVolumeMusic(float NewValue);
 	UFUNCTION(BlueprintCallable)
 	void SetAudioVolumeEffects(float NewValue);
+	UFUNCTION(BlueprintCallable)
+	void SetAudioVolumesToDefault();
+
+	UPROPERTY(BlueprintAssignable)
+	FAudioUINeedsRedrawDelegate OnAudioUINeedsRedraw;
 
 protected:
 	UPROPERTY(Config)

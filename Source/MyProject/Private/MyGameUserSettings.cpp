@@ -18,16 +18,31 @@ UMyGameUserSettings* UMyGameUserSettings::GetMyGameUserSettings()
 void UMyGameUserSettings::SetAudioVolumeMaster(float NewValue)
 {
 	AudioVolumeMaster = NewValue;
+	if(OnAudioUINeedsRedraw.IsBound())
+		OnAudioUINeedsRedraw.Broadcast();
 }
 
 void UMyGameUserSettings::SetAudioVolumeMusic(float NewValue)
 {
 	AudioVolumeMusic = NewValue;
+	if(OnAudioUINeedsRedraw.IsBound())
+		OnAudioUINeedsRedraw.Broadcast();
 }
 
 void UMyGameUserSettings::SetAudioVolumeEffects(float NewValue)
 {
 	AudioVolumeEffects = NewValue;
+	if(OnAudioUINeedsRedraw.IsBound())
+		OnAudioUINeedsRedraw.Broadcast();
+}
+
+void UMyGameUserSettings::SetAudioVolumesToDefault()
+{
+	AudioVolumeEffects = 1.0f;
+	AudioVolumeMusic = 1.0f;
+	AudioVolumeMaster = 1.0f;
+	if(OnAudioUINeedsRedraw.IsBound())
+		OnAudioUINeedsRedraw.Broadcast();
 }
 
 float UMyGameUserSettings::GetAudioVolumeMaster() const
