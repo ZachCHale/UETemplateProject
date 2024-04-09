@@ -1,0 +1,186 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GameSettingsSubsystem.h"
+
+#include "Kismet/GameplayStatics.h"
+
+DEFINE_LOG_CATEGORY(GameSettingsLog);
+
+#include "MyGameUserSettings.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+void UGameSettingsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+	Super::Initialize(Collection);
+	CreateResolutionKeyMappings();
+}
+
+void UGameSettingsSubsystem::Deinitialize()
+{
+	Super::Deinitialize();
+}
+
+void UGameSettingsSubsystem::SetResolutionByKey(FString Key)
+{
+	if(!ResolutionMap.Contains(Key))
+		return;
+	SetResolution(*ResolutionMap.Find(Key));
+}
+
+TMap<FString, FIntPoint> UGameSettingsSubsystem::GetResolutionOptions()
+{
+	return ResolutionMap;
+}
+
+FIntPoint UGameSettingsSubsystem::GetCurrentResolution()
+{
+	return UMyGameUserSettings::GetMyGameUserSettings()->GetScreenResolution();
+}
+
+void UGameSettingsSubsystem::SetDisplaySettingsToDefault()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetFullscreenMode(UserSettings->GetDefaultWindowMode());
+	UserSettings->SetScreenResolution(UserSettings->GetDefaultResolution());
+	UserSettings->ValidateSettings();
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::ApplyDisplaySettings()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->ApplyNonResolutionSettings();
+	UserSettings->ApplyResolutionSettings(false);
+	UserSettings->SaveSettings();
+	bHasUnsavedDisplayChanges = false;
+}
+
+bool UGameSettingsSubsystem::DoesDisplaySettingsNeedConfirmation()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	FIntPoint CurResolution = UserSettings->GetScreenResolution();
+	FIntPoint CurScreenMode = UserSettings->GetFullscreenMode();
+	FIntPoint ConfirmedResolution = UserSettings->GetLastConfirmedScreenResolution();
+	FIntPoint ConfirmedScreenMode = UserSettings->GetLastConfirmedFullscreenMode();
+	return CurResolution != ConfirmedResolution || CurScreenMode != ConfirmedScreenMode;
+}
+
+void UGameSettingsSubsystem::RevertDisplayToLastConfirmed()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->RevertVideoMode();
+	UserSettings->ApplyResolutionSettings(false);
+	UserSettings->SaveSettings();
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::ConfirmDisplaySettings()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->ConfirmVideoMode();
+	UserSettings->SaveSettings();
+}
+
+EWindowMode::Type UGameSettingsSubsystem::GetCurrentWindowMode()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	return UserSettings->GetFullscreenMode();
+}
+
+void UGameSettingsSubsystem::SetAudioSettingsToDefault()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetAudioVolumesToDefault();
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::ApplyAudioSettings()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SaveSettings();
+}
+
+void UGameSettingsSubsystem::SetScreenMode(EWindowMode::Type WindowMode)
+{
+	bHasUnsavedDisplayChanges = true;
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetFullscreenMode(WindowMode);
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::ReloadLastSavedSettings()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->LoadSettings();
+	bHasUnsavedDisplayChanges = false;
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::SetAudioVolume(USoundMix* SoundMix, USoundClass* SoundClass, float Volume, ESoundClassCategory SoundClassCategory)
+{
+	UGameplayStatics::SetSoundMixClassOverride(this, SoundMix, SoundClass, Volume, 1, 0, true);
+	UGameplayStatics::PushSoundMixModifier(this, SoundMix);
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	switch(SoundClassCategory)
+	{
+	case ESoundClassCategory::ESCC_Master:
+		UserSettings->SetAudioVolumeMaster(Volume);
+		break;
+	case ESoundClassCategory::ESCC_Music:
+		UserSettings->SetAudioVolumeMusic(Volume);
+		break;
+	case ESoundClassCategory::ESCC_Effects:
+		UserSettings->SetAudioVolumeEffects(Volume);
+		break;
+	}
+}
+
+float UGameSettingsSubsystem::GetCurrentAudioVolume(ESoundClassCategory SoundClassCategory)
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	switch( SoundClassCategory) {
+	case ESoundClassCategory::ESCC_Master:
+		return UserSettings->GetAudioVolumeMaster();
+		break;
+	case ESoundClassCategory::ESCC_Music:
+		return UserSettings->GetAudioVolumeMusic();
+		break;
+	case ESoundClassCategory::ESCC_Effects:
+		return UserSettings->GetAudioVolumeEffects();
+		break;
+	default:
+		return 0.0f;
+	}
+	
+}
+
+void UGameSettingsSubsystem::SetResolution(FIntPoint NewResolution)
+{
+	bHasUnsavedDisplayChanges = true;
+	UMyGameUserSettings::GetMyGameUserSettings()->SetScreenResolution(NewResolution);
+	if(OnSettingsUINeedsRedraw.IsBound())
+		OnSettingsUINeedsRedraw.Broadcast();
+}
+
+void UGameSettingsSubsystem::CreateResolutionKeyMappings()
+{
+	TArray<FIntPoint> SupportedResolutions;
+	bool suc = UKismetSystemLibrary::GetSupportedFullscreenResolutions(SupportedResolutions);
+	if(!suc)
+	{
+		UE_LOG(GameSettingsLog, Error, TEXT("Failed to gather supported resolutions"));
+		return;
+	}
+	ResolutionMap.Empty();
+	for (auto SupportedResolution : SupportedResolutions)
+	{
+		FString NewKey = FString::Printf(TEXT("%i X %i"), SupportedResolution.X, SupportedResolution.Y);
+		ResolutionMap.Add(NewKey, SupportedResolution);
+	}
+}
