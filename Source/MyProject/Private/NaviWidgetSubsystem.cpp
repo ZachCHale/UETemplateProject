@@ -24,6 +24,8 @@ void UNaviWidgetSubsystem::NavigateTo(UNaviWidget* NewTargetNaviWidget)
 		return;
 	bNavigationInProgress = true;
 
+
+
 	while(NavigationQueue.Num() > 0)
 	{
 		UNaviWidget* TargetNaviWidget = NavigationQueue[0];
