@@ -13,6 +13,7 @@ void UNaviWidget::DoesActionBubbleUp_Implementation(ENaviWidgetActionType Action
 
 void UNaviWidget::OnNavigatedTo()
 {
+	SetNavigationScope(ENaviWidgetNavigationScope::ENWNS_InScope);
 	OnNavigatedToBP();
 	if(OnNavigatedToFinished.IsBound())
 		OnNavigatedToFinished.Broadcast(this);
@@ -20,13 +21,23 @@ void UNaviWidget::OnNavigatedTo()
 
 void UNaviWidget::OnNavigatedIn()
 {
+	SetNavigationScope(ENaviWidgetNavigationScope::ENWNS_InScope);
 	OnNavigatedInBP();
 	if(OnNavigatedInFinished.IsBound())
 		OnNavigatedInFinished.Broadcast(this);
 }
 
+void UNaviWidget::SetNavigationScope(ENaviWidgetNavigationScope Scope)
+{
+	if(Scope == NavigationScope) return;
+	NavigationScope = Scope;
+	if(OnNavigationScopeChanged.IsBound())
+		OnNavigationScopeChanged.Broadcast(NavigationScope);
+}
+
 void UNaviWidget::OnNavigatedOut()
 {
+	SetNavigationScope(ENaviWidgetNavigationScope::ENWNS_OutOfScope);
 	OnNavigatedOutBP();
 	if(OnNavigatedOutFinished.IsBound())
 		OnNavigatedOutFinished.Broadcast(this);
@@ -90,6 +101,7 @@ void UNaviWidget::NativeConstruct()
 	{
 		TryParentingTo(Outer);
 	}
+	NavigationScope = ENaviWidgetNavigationScope::ENWNS_OutOfScope;
 }
 
 void UNaviWidget::DisplayNaviPath()

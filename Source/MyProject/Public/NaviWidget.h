@@ -22,9 +22,20 @@ enum class ENaviWidgetActionType : uint8
 	//ENWAT_SpecialLeft,	//Start And Select. Should name these after actions and not the button. (ex: Home - Info - Details)
 	//ENWAT_SpecialRight,
 };
+
+UENUM(BlueprintType)
+enum class ENaviWidgetNavigationScope : uint8
+{
+	ENWNS_OutOfScope,
+	ENWNS_InScope,
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigatedToDelegate, class UNaviWidget*, NaviWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigatedInDelegate, class UNaviWidget*, NaviWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigatedOutDelegate, class UNaviWidget*, NaviWidget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigationScopeChangedDelegate, ENaviWidgetNavigationScope, NewScope);
+
+
 /**
  * 
  */
@@ -96,6 +107,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FNavigatedOutDelegate OnNavigatedOutFinished;
 
+	UPROPERTY(BlueprintAssignable)
+	FNavigationScopeChangedDelegate OnNavigationScopeChanged;
+
+	UPROPERTY(BlueprintReadOnly)
+	ENaviWidgetNavigationScope NavigationScope;
+
 	UFUNCTION(BlueprintCallable)
 	void DisplayNaviPath();
 	UFUNCTION(BlueprintCallable)
@@ -108,5 +125,6 @@ private:
 	bool bIsParentSetExplicitly;
 	void TryParentingTo(UObject* Object);
 	void SetParent(UNaviWidget* Parent);
+	void SetNavigationScope(ENaviWidgetNavigationScope Scope);
 
 };
