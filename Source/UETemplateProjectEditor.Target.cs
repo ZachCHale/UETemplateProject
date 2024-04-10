@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class MyProjectTarget : TargetRules
+public class UETemplateProjectEditorTarget : TargetRules
 {
-	public MyProjectTarget(TargetInfo Target) : base(Target)
+	public UETemplateProjectEditorTarget( TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
-		ExtraModuleNames.Add("MyProject");
+		ExtraModuleNames.Add("UETemplateProject");
 	}
 }

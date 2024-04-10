@@ -12,7 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAudioUINeedsRedrawDelegate);
  * 
  */
 UCLASS()
-class MYPROJECT_API UMyGameUserSettings : public UGameUserSettings
+class UETEMPLATEPROJECT_API UMyGameUserSettings : public UGameUserSettings
 {
 	GENERATED_UCLASS_BODY()
 public:

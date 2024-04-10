@@ -15,7 +15,7 @@ DECLARE_LOG_CATEGORY_EXTERN(NaviWidgetLog, Log, All);
  * 
  */
 UCLASS()
-class MYPROJECT_API UNaviWidgetSubsystem : public UWorldSubsystem
+class UETEMPLATEPROJECT_API UNaviWidgetSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 

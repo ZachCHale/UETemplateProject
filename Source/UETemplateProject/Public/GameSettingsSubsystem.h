@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSettingsUINeedsRedrawDelegate);
  * 
  */
 UCLASS()
-class MYPROJECT_API UGameSettingsSubsystem : public UGameInstanceSubsystem
+class UETEMPLATEPROJECT_API UGameSettingsSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:

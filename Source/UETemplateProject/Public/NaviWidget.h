@@ -40,7 +40,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNavigationScopeChangedDelegate, ENa
  * 
  */
 UCLASS()
-class MYPROJECT_API UNaviWidget : public UUserWidget
+class UETEMPLATEPROJECT_API UNaviWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
