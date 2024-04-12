@@ -45,6 +45,7 @@ void UGameSettingsSubsystem::SetDisplaySettingsToDefault()
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->SetFullscreenMode(UserSettings->GetDefaultWindowMode());
 	UserSettings->SetScreenResolution(UserSettings->GetDefaultResolution());
+	UserSettings->SetVSyncEnabled(UserSettings->GetDefaultVSync());
 	UserSettings->ValidateSettings();
 
 	OnSettingsUINeedsRedraw.Broadcast();
@@ -185,6 +186,18 @@ float UGameSettingsSubsystem::GetCurrentAudioVolume(ESoundClassCategory SoundCla
 		return 0.0f;
 	}
 	
+}
+
+void UGameSettingsSubsystem::SetVSyncEnabled(bool bIsEnabled)
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetVSyncEnabled(bIsEnabled);
+	OnSettingsUINeedsRedraw.Broadcast();
+}
+
+bool UGameSettingsSubsystem::GetIsVSyncEnabled()
+{
+	return UMyGameUserSettings::GetMyGameUserSettings()->IsVSyncEnabled();
 }
 
 void UGameSettingsSubsystem::SetResolution(FIntPoint NewResolution)

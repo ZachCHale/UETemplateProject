@@ -66,6 +66,12 @@ public:
 	void SetAudioVolume(USoundMix* SoundMix, USoundClass* SoundClass, float Volume, ESoundClassCategory SoundClassCategory);
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentAudioVolume(ESoundClassCategory SoundClassCategory);
+
+	UFUNCTION(BlueprintCallable)
+	void SetVSyncEnabled(bool bIsEnabled);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetIsVSyncEnabled();
 	
 	UPROPERTY(BlueprintAssignable)
 	FSettingsUINeedsRedrawDelegate OnSettingsUINeedsRedraw;

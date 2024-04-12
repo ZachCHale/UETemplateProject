@@ -39,6 +39,8 @@ public:
 	
 	FIntPoint GetDefaultResolution();
 
+	bool GetDefaultVSync();
+
 protected:
 	UPROPERTY(Config)
 	float AudioVolumeMaster;
@@ -50,5 +52,7 @@ protected:
 	int32 DefaultResolutionX;
 	UPROPERTY(Config)
 	int32 DefaultResolutionY;
+	UPROPERTY(Config)
+	bool bDefaultVSync;
 
 };
