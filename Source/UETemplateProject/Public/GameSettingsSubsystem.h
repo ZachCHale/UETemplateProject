@@ -46,6 +46,8 @@ public:
 	void ConfirmDisplaySettings();
 	UFUNCTION(BlueprintCallable)
 	EWindowMode::Type GetCurrentWindowMode();
+	UFUNCTION(BlueprintCallable)
+	void SaveSettings();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetAudioSettingsToDefault();
@@ -68,6 +70,9 @@ private:
 	void CreateResolutionKeyMappings();
 
 	TMap<FString, FIntPoint> ResolutionMap;
+
+	FIntPoint LastConfirmedResolution;
+	EWindowMode::Type LastConfirmedWindowMode;
 
 	bool bHasUnsavedDisplayChanges;
 };

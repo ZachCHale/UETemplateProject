@@ -33,9 +33,11 @@ public:
 	void SetAudioVolumeEffects(float NewValue);
 	UFUNCTION(BlueprintCallable)
 	void SetAudioVolumesToDefault();
-
+	
 	UPROPERTY(BlueprintAssignable)
 	FAudioUINeedsRedrawDelegate OnAudioUINeedsRedraw;
+	
+	FIntPoint GetDefaultResolution();
 
 protected:
 	UPROPERTY(Config)
@@ -44,5 +46,9 @@ protected:
 	float AudioVolumeMusic;
 	UPROPERTY(Config)
 	float AudioVolumeEffects;
+	UPROPERTY(Config)
+	int32 DefaultResolutionX;
+	UPROPERTY(Config)
+	int32 DefaultResolutionY;
 
 };

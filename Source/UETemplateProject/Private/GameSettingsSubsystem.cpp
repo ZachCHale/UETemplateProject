@@ -2,18 +2,20 @@
 
 
 #include "GameSettingsSubsystem.h"
-
 #include "Kismet/GameplayStatics.h"
+#include "MyGameUserSettings.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 DEFINE_LOG_CATEGORY(GameSettingsLog);
 
-#include "MyGameUserSettings.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 void UGameSettingsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	CreateResolutionKeyMappings();
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	LastConfirmedResolution = UserSettings->GetLastConfirmedScreenResolution();
+	LastConfirmedWindowMode = UserSettings->GetLastConfirmedFullscreenMode();
 }
 
 void UGameSettingsSubsystem::Deinitialize()
@@ -53,7 +55,6 @@ void UGameSettingsSubsystem::ApplyDisplaySettings()
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->ApplyNonResolutionSettings();
 	UserSettings->ApplyResolutionSettings(false);
-	UserSettings->SaveSettings();
 	bHasUnsavedDisplayChanges = false;
 }
 
@@ -61,16 +62,17 @@ bool UGameSettingsSubsystem::DoesDisplaySettingsNeedConfirmation()
 {
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	FIntPoint CurResolution = UserSettings->GetScreenResolution();
-	FIntPoint CurScreenMode = UserSettings->GetFullscreenMode();
-	FIntPoint ConfirmedResolution = UserSettings->GetLastConfirmedScreenResolution();
-	FIntPoint ConfirmedScreenMode = UserSettings->GetLastConfirmedFullscreenMode();
+	EWindowMode::Type CurScreenMode = UserSettings->GetFullscreenMode();
+	FIntPoint ConfirmedResolution = LastConfirmedResolution;
+	EWindowMode::Type ConfirmedScreenMode = LastConfirmedWindowMode;
 	return CurResolution != ConfirmedResolution || CurScreenMode != ConfirmedScreenMode;
 }
 
 void UGameSettingsSubsystem::RevertDisplayToLastConfirmed()
 {
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
-	UserSettings->RevertVideoMode();
+	UserSettings->SetFullscreenMode(LastConfirmedWindowMode);
+	UserSettings->SetScreenResolution(LastConfirmedResolution);
 	UserSettings->ApplyResolutionSettings(false);
 	UserSettings->SaveSettings();
 	if(OnSettingsUINeedsRedraw.IsBound())
@@ -82,12 +84,20 @@ void UGameSettingsSubsystem::ConfirmDisplaySettings()
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->ConfirmVideoMode();
 	UserSettings->SaveSettings();
+	LastConfirmedWindowMode = UserSettings->GetLastConfirmedFullscreenMode();
+	LastConfirmedResolution = UserSettings->GetLastConfirmedScreenResolution();
 }
 
 EWindowMode::Type UGameSettingsSubsystem::GetCurrentWindowMode()
 {
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	return UserSettings->GetFullscreenMode();
+}
+
+void UGameSettingsSubsystem::SaveSettings()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SaveSettings();
 }
 
 void UGameSettingsSubsystem::SetAudioSettingsToDefault()
@@ -100,8 +110,7 @@ void UGameSettingsSubsystem::SetAudioSettingsToDefault()
 
 void UGameSettingsSubsystem::ApplyAudioSettings()
 {
-	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
-	UserSettings->SaveSettings();
+	SaveSettings();
 }
 
 void UGameSettingsSubsystem::SetScreenMode(EWindowMode::Type WindowMode)
@@ -164,6 +173,7 @@ void UGameSettingsSubsystem::SetResolution(FIntPoint NewResolution)
 {
 	bHasUnsavedDisplayChanges = true;
 	UMyGameUserSettings::GetMyGameUserSettings()->SetScreenResolution(NewResolution);
+
 	if(OnSettingsUINeedsRedraw.IsBound())
 		OnSettingsUINeedsRedraw.Broadcast();
 }
