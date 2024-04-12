@@ -46,8 +46,9 @@ void UGameSettingsSubsystem::SetDisplaySettingsToDefault()
 	UserSettings->SetFullscreenMode(UserSettings->GetDefaultWindowMode());
 	UserSettings->SetScreenResolution(UserSettings->GetDefaultResolution());
 	UserSettings->SetVSyncEnabled(UserSettings->GetDefaultVSync());
+	UserSettings->SetFrameRateLimit(UserSettings->GetDefaultFrameRateLimit());
 	UserSettings->ValidateSettings();
-
+	
 	OnSettingsUINeedsRedraw.Broadcast();
 }
 
@@ -198,6 +199,19 @@ void UGameSettingsSubsystem::SetVSyncEnabled(bool bIsEnabled)
 bool UGameSettingsSubsystem::GetIsVSyncEnabled()
 {
 	return UMyGameUserSettings::GetMyGameUserSettings()->IsVSyncEnabled();
+}
+
+void UGameSettingsSubsystem::SetFramerateLimit(float NewLimit)
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetFrameRateLimit(NewLimit);
+	OnSettingsUINeedsRedraw.Broadcast();
+}
+
+float UGameSettingsSubsystem::GetFramerateLimit()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	return UserSettings->GetFrameRateLimit();
 }
 
 void UGameSettingsSubsystem::SetResolution(FIntPoint NewResolution)

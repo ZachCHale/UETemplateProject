@@ -72,6 +72,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool GetIsVSyncEnabled();
+
+	UFUNCTION(BlueprintCallable)
+	void SetFramerateLimit(float NewLimit);
+	
+	UFUNCTION(BlueprintCallable)
+	float GetFramerateLimit();
 	
 	UPROPERTY(BlueprintAssignable)
 	FSettingsUINeedsRedrawDelegate OnSettingsUINeedsRedraw;

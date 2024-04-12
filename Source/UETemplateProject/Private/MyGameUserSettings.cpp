@@ -13,6 +13,8 @@ UMyGameUserSettings::UMyGameUserSettings(const FObjectInitializer& ObjectInitial
 	AudioVolumeMaster = 1.0f;
 	bDefaultVSync = true;
 	bUseVSync = bDefaultVSync;
+	DefaultFrameRateLimit = 0.0f;
+	FrameRateLimit = DefaultFrameRateLimit;
 	
 	TArray<FIntPoint> SupportedResolutions;
 	bool suc = UKismetSystemLibrary::GetSupportedFullscreenResolutions(SupportedResolutions);
@@ -70,6 +72,11 @@ void UMyGameUserSettings::SetAudioVolumesToDefault()
 FIntPoint UMyGameUserSettings::GetDefaultResolution()
 {
 	return FIntPoint(DefaultResolutionX, DefaultResolutionY);
+}
+
+float UMyGameUserSettings::GetDefaultFrameRateLimit()
+{
+	return DefaultFrameRateLimit;
 }
 
 bool UMyGameUserSettings::GetDefaultVSync()

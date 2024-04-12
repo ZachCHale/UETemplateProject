@@ -39,6 +39,8 @@ public:
 	
 	FIntPoint GetDefaultResolution();
 
+	float GetDefaultFrameRateLimit();
+	
 	bool GetDefaultVSync();
 
 protected:
@@ -54,5 +56,7 @@ protected:
 	int32 DefaultResolutionY;
 	UPROPERTY(Config)
 	bool bDefaultVSync;
+	UPROPERTY(Config)
+	bool DefaultFrameRateLimit;
 
 };
