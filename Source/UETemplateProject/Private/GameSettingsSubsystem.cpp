@@ -46,8 +46,8 @@ void UGameSettingsSubsystem::SetDisplaySettingsToDefault()
 	UserSettings->SetFullscreenMode(UserSettings->GetDefaultWindowMode());
 	UserSettings->SetScreenResolution(UserSettings->GetDefaultResolution());
 	UserSettings->ValidateSettings();
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::ApplyDisplaySettings()
@@ -75,8 +75,7 @@ void UGameSettingsSubsystem::RevertDisplayToLastConfirmed()
 	UserSettings->SetScreenResolution(LastConfirmedResolution);
 	UserSettings->ApplyResolutionSettings(false);
 	UserSettings->SaveSettings();
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::ConfirmDisplaySettings()
@@ -100,12 +99,31 @@ void UGameSettingsSubsystem::SaveSettings()
 	UserSettings->SaveSettings();
 }
 
+FIntPoint UGameSettingsSubsystem::GetMaxResolution()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+
+	TArray<FIntPoint> SupportedResolutions;
+	bool suc = UKismetSystemLibrary::GetSupportedFullscreenResolutions(SupportedResolutions);
+	if(!suc || SupportedResolutions.Num() == 0)
+	{
+		return UserSettings->GetDefaultResolution();
+	}
+	FIntPoint MaxRes = SupportedResolutions[0];
+	for (auto Resolution : SupportedResolutions)
+	{
+		if(Resolution.Size() > MaxRes.Size())
+			MaxRes = Resolution;
+	}
+	return MaxRes;
+}
+
 void UGameSettingsSubsystem::SetAudioSettingsToDefault()
 {
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->SetAudioVolumesToDefault();
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::ApplyAudioSettings()
@@ -118,8 +136,8 @@ void UGameSettingsSubsystem::SetScreenMode(EWindowMode::Type WindowMode)
 	bHasUnsavedDisplayChanges = true;
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->SetFullscreenMode(WindowMode);
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::ReloadLastSavedSettings()
@@ -127,8 +145,8 @@ void UGameSettingsSubsystem::ReloadLastSavedSettings()
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	UserSettings->LoadSettings();
 	bHasUnsavedDisplayChanges = false;
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::SetAudioVolume(USoundMix* SoundMix, USoundClass* SoundClass, float Volume, ESoundClassCategory SoundClassCategory)
@@ -173,9 +191,8 @@ void UGameSettingsSubsystem::SetResolution(FIntPoint NewResolution)
 {
 	bHasUnsavedDisplayChanges = true;
 	UMyGameUserSettings::GetMyGameUserSettings()->SetScreenResolution(NewResolution);
-
-	if(OnSettingsUINeedsRedraw.IsBound())
-		OnSettingsUINeedsRedraw.Broadcast();
+	
+	OnSettingsUINeedsRedraw.Broadcast();
 }
 
 void UGameSettingsSubsystem::CreateResolutionKeyMappings()

@@ -17,6 +17,8 @@ enum class ESoundClassCategory : uint8
 
 DECLARE_LOG_CATEGORY_EXTERN(GameSettingsLog, Log, All);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSettingsUINeedsRedrawDelegate);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScreenModeChangedDelegate, EWindowMode::Type, NewScreenMode);
+
 /**
  * 
  */
@@ -48,6 +50,8 @@ public:
 	EWindowMode::Type GetCurrentWindowMode();
 	UFUNCTION(BlueprintCallable)
 	void SaveSettings();
+	UFUNCTION(BlueprintCallable)
+	FIntPoint GetMaxResolution();
 	
 	UFUNCTION(BlueprintCallable)
 	void SetAudioSettingsToDefault();
@@ -65,6 +69,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FSettingsUINeedsRedrawDelegate OnSettingsUINeedsRedraw;
+
+	//UPROPERTY(BlueprintAssignable)
+	//FScreenModeChangedDelegate OnScreenModeChanged;
 private:
 	void SetResolution(FIntPoint NewResolution);
 	void CreateResolutionKeyMappings();
