@@ -4,6 +4,7 @@
 #include "GameSettingsSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "MyGameUserSettings.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 DEFINE_LOG_CATEGORY(GameSettingsLog);
@@ -13,6 +14,7 @@ void UGameSettingsSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	CreateResolutionKeyMappings();
+	CreateLanguageKeyMappings();
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
 	LastConfirmedResolution = UserSettings->GetLastConfirmedScreenResolution();
 	LastConfirmedWindowMode = UserSettings->GetLastConfirmedFullscreenMode();
@@ -189,6 +191,33 @@ float UGameSettingsSubsystem::GetCurrentAudioVolume(ESoundClassCategory SoundCla
 	
 }
 
+void UGameSettingsSubsystem::SetCurrentLanguage(FString LanguageKey)
+{
+	if(!LanguageMap.Contains(LanguageKey))
+		return;
+	UMyGameUserSettings::GetMyGameUserSettings()->SetLocalizationLanguage(LanguageKey);
+	UMyGameUserSettings::GetMyGameUserSettings()->ApplyLocalizationLanguage();
+	OnSettingsUINeedsRedraw.Broadcast();
+}
+
+FString UGameSettingsSubsystem::GetCurrentLanguage()
+{
+	return UMyGameUserSettings::GetMyGameUserSettings()->GetLocalizationLanguage();
+}
+
+void UGameSettingsSubsystem::SetCurrentLanguageToDefault()
+{
+	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
+	UserSettings->SetLocalizationLanguage(UserSettings->GetDefaultLocalizationLanguage());
+	UserSettings->ApplyLocalizationLanguage();
+	OnSettingsUINeedsRedraw.Broadcast();
+}
+
+TMap<FString, FString> UGameSettingsSubsystem::GetLanguageOptions()
+{
+	return LanguageMap;
+}
+
 void UGameSettingsSubsystem::SetVSyncEnabled(bool bIsEnabled)
 {
 	UMyGameUserSettings* UserSettings = UMyGameUserSettings::GetMyGameUserSettings();
@@ -236,5 +265,15 @@ void UGameSettingsSubsystem::CreateResolutionKeyMappings()
 	{
 		FString NewKey = FString::Printf(TEXT("%i X %i"), SupportedResolution.X, SupportedResolution.Y);
 		ResolutionMap.Add(NewKey, SupportedResolution);
+	}
+}
+
+void UGameSettingsSubsystem::CreateLanguageKeyMappings()
+{
+	TArray<FString> LocalizedCultures = UKismetInternationalizationLibrary::GetLocalizedCultures();
+	LanguageMap.Empty();
+	for (auto LocalizedCulture : LocalizedCultures)
+	{
+		LanguageMap.Add(LocalizedCulture, UKismetInternationalizationLibrary::GetCultureDisplayName(LocalizedCulture, false));
 	}
 }

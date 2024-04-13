@@ -68,6 +68,18 @@ public:
 	float GetCurrentAudioVolume(ESoundClassCategory SoundClassCategory);
 
 	UFUNCTION(BlueprintCallable)
+	void SetCurrentLanguage(FString LanguageKey);
+
+	UFUNCTION(BlueprintCallable)
+	FString GetCurrentLanguage();
+
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentLanguageToDefault();
+
+	UFUNCTION(BlueprintCallable)
+	TMap<FString, FString> GetLanguageOptions();
+
+	UFUNCTION(BlueprintCallable)
 	void SetVSyncEnabled(bool bIsEnabled);
 
 	UFUNCTION(BlueprintCallable)
@@ -87,9 +99,13 @@ public:
 private:
 	void SetResolution(FIntPoint NewResolution);
 	void CreateResolutionKeyMappings();
+	void CreateLanguageKeyMappings();
+
 
 	TMap<FString, FIntPoint> ResolutionMap;
 
+	TMap<FString, FString> LanguageMap;
+	
 	FIntPoint LastConfirmedResolution;
 	EWindowMode::Type LastConfirmedWindowMode;
 

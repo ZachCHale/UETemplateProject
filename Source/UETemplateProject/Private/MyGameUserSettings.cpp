@@ -4,6 +4,7 @@
 #include "MyGameUserSettings.h"
 
 #include "Kismet/BlueprintTypeConversions.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 UMyGameUserSettings::UMyGameUserSettings(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -15,6 +16,8 @@ UMyGameUserSettings::UMyGameUserSettings(const FObjectInitializer& ObjectInitial
 	bUseVSync = bDefaultVSync;
 	DefaultFrameRateLimit = 0.0f;
 	FrameRateLimit = DefaultFrameRateLimit;
+	LocalizationLanguage = UKismetInternationalizationLibrary::GetCurrentLanguage();
+	DefaultLocalizationLanguage = UKismetInternationalizationLibrary::GetCurrentLanguage();
 	
 	TArray<FIntPoint> SupportedResolutions;
 	bool suc = UKismetSystemLibrary::GetSupportedFullscreenResolutions(SupportedResolutions);
@@ -67,6 +70,31 @@ void UMyGameUserSettings::SetAudioVolumesToDefault()
 	AudioVolumeMaster = 1.0f;
 	if(OnAudioUINeedsRedraw.IsBound())
 		OnAudioUINeedsRedraw.Broadcast();
+}
+
+void UMyGameUserSettings::SetLocalizationLanguage(FString LanguageTag)
+{
+	TArray<FString> LocalizedCultures = UKismetInternationalizationLibrary::GetLocalizedCultures();
+	if(!LocalizedCultures.Contains(LanguageTag))
+		return;
+	LocalizationLanguage = LanguageTag;
+}
+
+
+
+FString UMyGameUserSettings::GetLocalizationLanguage()
+{
+	return LocalizationLanguage;
+}
+
+void UMyGameUserSettings::ApplyLocalizationLanguage()
+{
+	UKismetInternationalizationLibrary::SetCurrentCulture(LocalizationLanguage);
+}
+
+FString UMyGameUserSettings::GetDefaultLocalizationLanguage()
+{
+	return DefaultLocalizationLanguage;
 }
 
 FIntPoint UMyGameUserSettings::GetDefaultResolution()

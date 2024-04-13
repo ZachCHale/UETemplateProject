@@ -33,10 +33,16 @@ public:
 	void SetAudioVolumeEffects(float NewValue);
 	UFUNCTION(BlueprintCallable)
 	void SetAudioVolumesToDefault();
-	
+	UFUNCTION(BlueprintCallable)
+	void SetLocalizationLanguage(FString LanguageTag);
+	UFUNCTION(BlueprintCallable)
+	FString GetLocalizationLanguage();
 	UPROPERTY(BlueprintAssignable)
 	FAudioUINeedsRedrawDelegate OnAudioUINeedsRedraw;
-	
+	UFUNCTION(BlueprintCallable)
+	void ApplyLocalizationLanguage();
+
+	FString GetDefaultLocalizationLanguage();
 	FIntPoint GetDefaultResolution();
 
 	float GetDefaultFrameRateLimit();
@@ -58,5 +64,9 @@ protected:
 	bool bDefaultVSync;
 	UPROPERTY(Config)
 	bool DefaultFrameRateLimit;
+	UPROPERTY(Config)
+	FString LocalizationLanguage;
+	UPROPERTY(Config)
+	FString DefaultLocalizationLanguage;
 
 };
