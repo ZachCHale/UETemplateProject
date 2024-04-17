@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UserSettings/EnhancedInputUserSettings.h"
 #include "GameSettingsSubsystem.generated.h"
 
 
@@ -93,6 +94,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FSettingsUINeedsRedrawDelegate OnSettingsUINeedsRedraw;
+
+	//UFUNCTION(BlueprintCallable)
+	//void ChangeKeyBind(UEnhancedInputUserSettings* InputUserSettings);
 
 	//UPROPERTY(BlueprintAssignable)
 	//FScreenModeChangedDelegate OnScreenModeChanged;
